@@ -14,6 +14,8 @@ const TabContainer = (props) => {
           props?.setCode(false);
           props?.setQuiz(false);
         }}
+        testID="Notes"
+        accessibilityLabel="Notes"
         style={
           props?.notes === true
             ? [
@@ -46,6 +48,8 @@ const TabContainer = (props) => {
           props?.setCode(true);
           props?.setQuiz(false);
         }}
+        testID="Code"
+        accessibilityLabel="Code"
         style={
           props?.code === true
             ? [

@@ -34,10 +34,26 @@ const Ebooks = props => {
     });
   };
 
-  const RenderPDFList = (item, index) => {
+  // Helper function to clean and generate testID from book name
+  const cleanTestID = (str) => {
+    if (!str) return '';
+    return str
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+      .substring(0, 50); // Limit length
+  };
+
+  const RenderPDFList = (item, index, language) => {
+    const testID = `ebook-${language}-${cleanTestID(item?.book)}-${index}`;
+    const accessibilityLabel = item?.book || `Ebook ${index + 1}`;
+
     return (
       <Pressable
         onPress={() => openPDF(item?.urls)}
+        testID={testID}
+        accessibilityLabel={accessibilityLabel}
+        accessible={true}
         style={styles?.rowContainer}
       >
         <Text style={{ color: theme?.textColor }}>• </Text>
@@ -77,7 +93,7 @@ const Ebooks = props => {
         <FlatList
           scrollEnabled={false}
           data={ebooksData?.c}
-          renderItem={({ item, index }) => RenderPDFList(item, index)}
+          renderItem={({ item, index }) => RenderPDFList(item, index, 'c')}
           ListHeaderComponent={
             <Text
               style={[
@@ -101,7 +117,7 @@ const Ebooks = props => {
         <FlatList
           scrollEnabled={false}
           data={ebooksData?.cpp}
-          renderItem={({ item, index }) => RenderPDFList(item, index)}
+          renderItem={({ item, index }) => RenderPDFList(item, index, 'cpp')}
           ListHeaderComponent={
             <Text
               style={[
@@ -125,7 +141,7 @@ const Ebooks = props => {
         <FlatList
           scrollEnabled={false}
           data={ebooksData?.java}
-          renderItem={({ item, index }) => RenderPDFList(item, index)}
+          renderItem={({ item, index }) => RenderPDFList(item, index, 'java')}
           ListHeaderComponent={
             <Text
               style={[
@@ -149,7 +165,7 @@ const Ebooks = props => {
         <FlatList
           scrollEnabled={false}
           data={ebooksData?.sql}
-          renderItem={({ item, index }) => RenderPDFList(item, index)}
+          renderItem={({ item, index }) => RenderPDFList(item, index, 'sql')}
           ListHeaderComponent={
             <Text
               style={[

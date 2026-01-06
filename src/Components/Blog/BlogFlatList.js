@@ -4,11 +4,27 @@ import styles from "./styles";
 import { Constants, Colors } from "../../Utils";
 import { useTheme } from "@react-navigation/native";
 
+// Helper function to clean and generate testID from title
+const cleanTestID = (str) => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .substring(0, 50); // Limit length
+};
+
 const BlogFlatList = ({ item, index, handleItemClick }) => {
   const theme = useTheme()?.colors;
+  const testID = `blog-item-${cleanTestID(item?.title)}-${index}`;
+  const accessibilityLabel = item?.title || `Blog item ${index + 1}`;
+
   return (
     <TouchableOpacity
       onPress={() => handleItemClick(item)}
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+      accessible={true}
       style={{
         flex: 1,
         marginVertical: 10,

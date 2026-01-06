@@ -4,6 +4,26 @@ import { Constants } from "../../Utils";
 import styles from "./styles";
 import { useTheme } from "@react-navigation/native";
 
+// Helper function to remove emojis and newlines from accessibility IDs
+const cleanAccessibilityId = (str) => {
+  if (!str) return str;
+  // Remove emojis (Unicode ranges for emojis)
+  // Remove newlines and replace with spaces
+  return str
+    .replace(/\n/g, ' ')
+    .replace(/[\u{1F600}-\u{1F64F}]/gu, '') // Emoticons
+    .replace(/[\u{1F300}-\u{1F5FF}]/gu, '') // Misc Symbols and Pictographs
+    .replace(/[\u{1F680}-\u{1F6FF}]/gu, '') // Transport and Map
+    .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '') // Flags
+    .replace(/[\u{2600}-\u{26FF}]/gu, '') // Misc symbols
+    .replace(/[\u{2700}-\u{27BF}]/gu, '') // Dingbats
+    .replace(/[\u{FE00}-\u{FE0F}]/gu, '') // Variation Selectors
+    .replace(/[\u{1F900}-\u{1F9FF}]/gu, '') // Supplemental Symbols and Pictographs
+    .replace(/[\u{1FA00}-\u{1FAFF}]/gu, '') // Chess Symbols
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .trim();
+};
+
 const Card = (props) => {
   const theme = useTheme()?.colors;
   if (props?.side === "right") {
@@ -11,6 +31,9 @@ const Card = (props) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => props?.onCardPress()}
+        testID={cleanAccessibilityId(props?.testID)}
+        accessibilityLabel={cleanAccessibilityId(props?.testID || props?.newTitle)}
+        accessible={true}
         style={[
           styles?.mainContainer,
           { backgroundColor: props?.bgColor, width: "90%", height: 120 },
@@ -19,6 +42,7 @@ const Card = (props) => {
         <View style={styles?.textContainer}>
           {props?.titleNum ? (
             <Text
+              accessible={false}
               style={[
                 styles?.textStyleGirl,
                 {
@@ -32,6 +56,7 @@ const Card = (props) => {
 
           {props?.newTitle ? (
             <Text
+              accessible={false}
               style={[
                 styles?.textStyleGirl,
                 { fontSize: props?.fontSize, color: theme?.cardText },
@@ -42,6 +67,7 @@ const Card = (props) => {
           ) : null}
           {props?.title ? (
             <Text
+              accessible={false}
               style={[
                 styles?.textStyleGirl,
                 {
@@ -57,6 +83,7 @@ const Card = (props) => {
           ) : null}
           {props?.titleNum ? (
             <Text
+              accessible={false}
               style={[
                 styles?.textStyleGirl,
                 {
@@ -98,6 +125,9 @@ const Card = (props) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => props?.onCardPress()}
+        testID={cleanAccessibilityId(props?.testID)}
+        accessibilityLabel={cleanAccessibilityId(props?.testID || props?.newTitle)}
+        accessible={true}
         style={[
           styles?.mainContainer,
           { backgroundColor: props?.bgColor, width: "90%", height: 120 },
@@ -143,13 +173,14 @@ const Card = (props) => {
           }}
         >
           {props?.titleNum ? (
-            <Text style={[styles?.textStyleGirl, { color: theme?.cardText }]}>
+            <Text accessible={false} style={[styles?.textStyleGirl, { color: theme?.cardText }]}>
               {props?.titleNum}
             </Text>
           ) : null}
 
           {props?.newTitle ? (
             <Text
+              accessible={false}
               style={[
                 styles?.textStyleGirl,
                 {
@@ -165,6 +196,7 @@ const Card = (props) => {
 
           {props?.title ? (
             <Text
+              accessible={false}
               style={[
                 styles?.textStyleGirl,
                 {
@@ -180,7 +212,7 @@ const Card = (props) => {
           ) : null}
 
           {props?.titleNum ? (
-            <Text style={[styles?.textStyleGirl, { color: theme?.cardText }]}>
+            <Text accessible={false} style={[styles?.textStyleGirl, { color: theme?.cardText }]}>
               {" "}
               {Constants?.semester}
             </Text>
@@ -193,6 +225,9 @@ const Card = (props) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => props?.onCardPress()}
+        testID={cleanAccessibilityId(props?.testID)}
+        accessibilityLabel={cleanAccessibilityId(props?.testID || props?.newTitle)}
+        accessible={true}
         style={[
           styles?.mainContainer,
           {
@@ -238,6 +273,7 @@ const Card = (props) => {
         >
           {props?.titleNum ? (
             <Text
+              accessible={false}
               style={[
                 styles?.textStyleGirl,
                 { fontSize: 22, color: theme?.cardText },
@@ -249,6 +285,7 @@ const Card = (props) => {
 
           {props?.newTitle ? (
             <Text
+              accessible={false}
               style={[
                 styles?.textStyleGirl,
                 { fontSize: props?.size ?? 18, color: theme?.cardText },
@@ -261,6 +298,7 @@ const Card = (props) => {
 
           {props?.title ? (
             <Text
+              accessible={false}
               style={[
                 styles?.textStyleGirl,
                 {
@@ -276,6 +314,7 @@ const Card = (props) => {
           ) : null}
           {props?.titleNum ? (
             <Text
+              accessible={false}
               style={[
                 styles?.textStyleGirl,
                 { fontSize: 22, color: theme?.cardText },
