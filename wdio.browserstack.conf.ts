@@ -26,8 +26,10 @@ const deviceConfig = {
 
 export const config: Options.Testrunner = {
   runner: 'local',
-  port: 4723,
+  hostname: 'hub.browserstack.com',
+  port: 443,
   path: '/wd/hub',
+  protocol: 'https',
   
   specs: [
     './e2e/specs/**/*.ts'
@@ -71,8 +73,6 @@ export const config: Options.Testrunner = {
   logLevel: 'info',
   
   bail: 0,
-  
-  baseUrl: 'https://hub.browserstack.com/wd/hub',
   
   waitforTimeout: 10000,
   

@@ -7,15 +7,11 @@ on:
     branches: [ main, develop ]
   workflow_dispatch:
 
-env:
-  NODE_VERSION: '20'
-  JAVA_VERSION: '17'
-
 jobs:
   test:
-    name: Build & Test on BrowserStack
-    runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    name: Run E2E Tests on BrowserStack
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: 📥 Checkout code
@@ -24,115 +20,11 @@ jobs:
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: '20'
           cache: 'npm'
-
-      - name: ☕ Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: ${{ env.JAVA_VERSION }}
-
-      - name: 📱 Setup Android SDK
-        run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          export ANDROID_SDK_ROOT=$HOME/android-sdk
-          
-          mkdir -p $ANDROID_HOME
-          cd $ANDROID_HOME
-          
-          # Download and install command line tools
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip
-          mkdir -p cmdline-tools/latest
-          mv cmdline-tools/* latest/ 2>/dev/null || true
-          mv latest cmdline-tools/ 2>/dev/null || true
-          
-          # Set PATH for sdkmanager
-          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
-          
-          # Verify sdkmanager is accessible
-          if ! command -v sdkmanager &> /dev/null; then
-            echo "sdkmanager not found, trying direct path..."
-            $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version || {
-              echo "ERROR: sdkmanager still not found"
-              ls -la $ANDROID_HOME/cmdline-tools/latest/bin/ || echo "Directory doesn't exist"
-              exit 1
-            }
-          fi
-          
-          # Accept licenses
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          
-          # Install required packages
-          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "ndk;27.1.12297006"
-          
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
-          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
 
       - name: 📥 Install dependencies
         run: npm ci
-
-      - name: 💾 Cache Gradle dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            android/.gradle
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: 🔨 Build Android APK
-        timeout-minutes: 40
-        run: |
-          cd android
-          chmod +x gradlew
-          
-          echo "=== Build Configuration ==="
-          echo "ANDROID_HOME: $ANDROID_HOME"
-          echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
-          echo "Building for x86_64 architecture only"
-          
-          echo "=== Pre-build: Check NDK ==="
-          if [ -d "$ANDROID_HOME/ndk/27.1.12297006" ]; then
-            echo "NDK already installed"
-          else
-            echo "NDK will be installed during build (this may take 10-15 minutes)"
-          fi
-          
-          echo "=== Starting Gradle build ==="
-          echo "This may take 30-40 minutes on first build due to NDK installation"
-          echo "Progress will be shown below..."
-          
-          # Run with info logging to see progress
-          ./gradlew assembleDebug \
-            --no-daemon \
-            --info \
-            -PreactNativeArchitectures=x86_64 \
-            --console=plain 2>&1 | tee build.log || {
-            echo "=== Build failed ==="
-            echo "Last 50 lines of build log:"
-            tail -50 build.log
-            exit 1
-          }
-          
-          echo "=== Build completed ==="
-          if [ ! -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
-            echo "ERROR: APK not found after build!"
-            ls -la app/build/outputs/apk/debug/ || echo "Output directory doesn't exist"
-            exit 1
-          fi
-          echo "APK found:"
-          ls -lh app/build/outputs/apk/debug/
-          cd ..
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.console=plain"
 
       - name: 🧪 Run E2E Tests on BrowserStack
         run: npm run test:e2e:browserstack:all
@@ -143,8 +35,7 @@ jobs:
 
       - name: 📊 Generate Allure Report
         if: always()
-        run: |
-          npx allure-commandline generate allure-results --clean -o allure-report || echo "Allure report generation skipped (no results)"
+        run: npx allure-commandline generate allure-results --clean -o allure-report || echo "No results"
 
       - name: 📤 Upload Test Results
         if: always()
@@ -157,4 +48,3 @@ jobs:
             screenshots/
           retention-days: 7
           if-no-files-found: ignore
-
