@@ -13,15 +13,15 @@ export class BasePage {
   }
 
   get menuButton() {
-    return this.driver.$('~menuButton');
+    return this.driver.$('android=new UiSelector().description("menuButton")');
   }
 
   get homeButton() {
-    return this.driver.$('~Semester1');
+    return this.driver.$('android=new UiSelector().description("Semester1")');
   }
 
   get languageModalCloseButton() {
-    return this.driver.$('~languageModalCloseButton');
+    return this.driver.$('android=new UiSelector().description("languageModalCloseButton")');
   }
 
   async click(element: WebdriverIOElement, timeout: number = 10000): Promise<void> {
@@ -71,22 +71,17 @@ export class BasePage {
   }
 
   async isOnHomePage(): Promise<boolean> {
-    // Use menuButton as indicator - more reliable than Semester1
-    return await this.isDisplayed(this.menuButton);
+    return await this.isDisplayed(this.homeButton);
   }
 
   async navigateToHome(): Promise<void> {
     await this.dismissExternalApps();
     
     if (await this.isOnHomePage()) {
-      await this.dismissLanguageModal();
       return;
     }
 
     await this.driver.activateApp(APP_PACKAGE_NAME);
-    
-    // Dismiss language modal that may appear on fresh installs (BrowserStack)
-    await this.dismissLanguageModal();
 
     const homePageLoaded = await this.isOnHomePage();
     if (homePageLoaded) {
@@ -95,8 +90,8 @@ export class BasePage {
 
     await this.driver.pressKeyCode(4);
     
-    // Dismiss language modal again after navigation
-    await this.dismissLanguageModal();
+    // Excessive timeout to ensure home page is loaded. Team will need to improve performance.
+    await this.homeButton.waitForDisplayed({ timeout: 40000 });
   }
 
   async dismissLanguageModal(): Promise<void> {
