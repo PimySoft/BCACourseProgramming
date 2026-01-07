@@ -15,7 +15,7 @@ jobs:
   test:
     name: Build & Test on BrowserStack
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: 📥 Checkout code
@@ -43,12 +43,23 @@ jobs:
       - name: 📥 Install dependencies
         run: npm ci
 
+      - name: 💾 Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: 🔨 Build Android APK
-        timeout-minutes: 20
+        timeout-minutes: 25
         run: |
           cd android
           chmod +x gradlew
-          echo "Starting Gradle build (this may take 5-10 minutes for first build)..."
+          echo "Starting Gradle build (first build may take 20-25 minutes due to NDK installation)..."
           ./gradlew assembleDebug --no-daemon --stacktrace || {
             echo "Build failed, checking logs..."
             exit 1
