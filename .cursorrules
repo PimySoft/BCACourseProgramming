@@ -1,6 +1,18 @@
-# E2E Testing Coding Standards
+# Cursor Rules for BCA Course Programming Project
 
-This document defines coding standards and best practices for maintaining the Appium E2E test suite. Follow these guidelines to ensure consistency and quality.
+## ⚠️ Scope: E2E Testing Only
+
+**IMPORTANT**: The coding standards below apply **ONLY** to Appium E2E testing code in the `e2e/` directory. These standards do NOT apply to the React Native application code in `src/`, `App.js`, or other parts of the project.
+
+When working on:
+- **E2E tests** (`e2e/` directory): Follow the standards below
+- **React Native app code** (outside `e2e/`): Use standard React Native/JavaScript best practices
+
+---
+
+## E2E Testing Coding Standards
+
+This document defines coding standards and best practices for maintaining the Appium E2E test suite. Follow these guidelines to ensure consistency and quality **when working in the `e2e/` directory**.
 
 ---
 
@@ -51,7 +63,6 @@ getListItem(index: number) {
 // ✅ GOOD: Use Appium wait methods directly
 await element.waitForDisplayed({ timeout: 5000 });
 await this.isDisplayed(element);
-
 
 // ✅ GOOD: Only comment when explaining WHY, not WHAT
 // Excessive timeout to ensure home page is loaded. Team will need to improve performance.
@@ -405,10 +416,6 @@ Remove these immediately when found:
 
 ---
 
-## 🔧 TypeScript Standards
-
----
-
 ## ✅ Error Messages
 
 ### Assertion Messages
@@ -448,13 +455,23 @@ await expect(semPage.notesTab).toBeDisplayed({ message: 'Failed' });
 
 ---
 
-## 📚 References
+## E2E Testing Project Context
 
-- [WebdriverIO Best Practices](https://webdriver.io/docs/best-practices)
-- [Appium Documentation](https://appium.io/docs/en/latest/)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- Testing Framework: Appium 3.0 + WebdriverIO 9.3 + TypeScript
+- Target App: React Native 0.82.1 with React Navigation v7
+- Platform: Android (primary), iOS (available but not tested)
+- Test Location: `e2e/` directory only
+
+## General E2E Code Quality (Applies to `e2e/` directory only)
+
+- Remove unused imports and code immediately
+- Prefer self-documenting code over comments
+- Only comment when explaining WHY, not WHAT
+- Keep functions focused and single-purpose
+- Use descriptive variable and method names
 
 ---
 
-**Remember:** Clean, maintainable code is more important than clever code. When in doubt, choose the simpler, more explicit solution.
-
+**Remember:** 
+- Clean, maintainable code is more important than clever code. When in doubt, choose the simpler, more explicit solution.
+- **These standards apply ONLY to E2E testing code in the `e2e/` directory, NOT to the React Native application code.**
