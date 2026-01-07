@@ -153,6 +153,9 @@ const Sem = props => {
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => closeModal()}
+            testID="languageModalCloseButton"
+            accessibilityLabel="Close language selection modal"
+            accessible={true}
             style={[
               styles?.crossIconStyle,
               {

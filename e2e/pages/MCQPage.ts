@@ -1,3 +1,4 @@
+import { expect } from '@wdio/globals';
 import { BasePage } from './BasePage';
 
 export class MCQPage extends BasePage {
@@ -16,7 +17,9 @@ export class MCQPage extends BasePage {
   }
 
   async waitForPageLoad(): Promise<void> {
-    await this.exitButton.waitForDisplayed({ timeout: 15000 });
+    await expect(this.exitButton).toBeDisplayed({ 
+      message: 'Exit button should be displayed on MCQ quiz page' 
+    });
   }
 
   async exitQuiz(): Promise<void> {

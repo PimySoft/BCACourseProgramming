@@ -18,16 +18,13 @@ describe('Home Page Tests', () => {
   });
 
   beforeEach(async () => {
-    // Dismiss any external apps (like Gmail) that might be open
     await homePage.dismissExternalApps();
-    // Ensure we start from home page for each test
     await homePage.navigateToHome();
     await homePage.waitForPageLoad();
   });
 
   afterEach(async () => {
-    // Clean up: return to home page after each test
-    await homePage.navigateToHome();
+    await homePage.cleanup();
   });
 
   it('should display home page elements', async () => {
@@ -37,16 +34,6 @@ describe('Home Page Tests', () => {
 
     await expect(homePage.compiler).toBeDisplayed({ 
       message: 'Compiler button should be displayed on home page' 
-    });
-  });
-
-  it.skip('should open navigation menu', async () => {
-    // Skipped: Opening menu triggers mailto: links (Report/Suggestions buttons)
-    // which open Gmail login dialog, adding unnecessary complexity for tech test
-    await homePage.openMenu();
-    // Verify menu opened - menu button should still be accessible
-    await expect(homePage.menuButton).toBeDisplayed({ 
-      message: 'Menu button should remain accessible after opening menu' 
     });
   });
 

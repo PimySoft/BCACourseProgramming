@@ -1,3 +1,4 @@
+import { expect } from '@wdio/globals';
 import { BasePage } from './BasePage';
 
 export class CodeViewPage extends BasePage {
@@ -6,7 +7,9 @@ export class CodeViewPage extends BasePage {
   }
 
   async waitForPageLoad(): Promise<void> {
-    await this.menuButton.waitForDisplayed({ timeout: 15000 });
+    await expect(this.menuButton).toBeDisplayed({ 
+      message: 'Menu button should be displayed on code view page' 
+    });
   }
 }
 

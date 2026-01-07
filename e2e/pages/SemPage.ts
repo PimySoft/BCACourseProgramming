@@ -1,3 +1,4 @@
+import { expect } from '@wdio/globals';
 import { BasePage } from './BasePage';
 
 export class SemPage extends BasePage {
@@ -15,7 +16,10 @@ export class SemPage extends BasePage {
   }
 
   async waitForPageLoad(): Promise<void> {
-    await this.menuButton.waitForDisplayed({ timeout: 15000 });
+    await this.dismissLanguageModal();
+    await expect(this.menuButton).toBeDisplayed({ 
+      message: 'Menu button should be displayed on semester page' 
+    });
   }
 
   async switchToNotesTab(): Promise<void> {

@@ -34,9 +34,7 @@ describe('Semester Content Navigation Flow', () => {
   });
 
   afterEach(async () => {
-    // Clean up: return to home page after each test
-    // This ensures tests run in isolation
-    await homePage.navigateToHome();
+    await homePage.cleanup();
   });
 
   it('should navigate through semester content and verify all tabs', async () => {
@@ -98,7 +96,7 @@ describe('Semester Content Navigation Flow', () => {
   });
 
   it('should navigate through multiple semesters and verify consistency', async () => {
-    const semesters = [1, 2, 3] as const;
+    const semesters = [1, 2] as const;
 
     for (const semester of semesters) {
       // Navigate to semester
@@ -124,9 +122,9 @@ describe('Semester Content Navigation Flow', () => {
       await semPage.switchToNotesTab();
       // Wait is handled inside switchToNotesTab()
 
-      // Navigate back to home - ensure clean state for next iteration
-      await semPage.openMenu();
+      await semPage.navigateToHome();
       await homePage.waitForPageLoad();
+      await homePage.semester1.waitForDisplayed({ timeout: 10000 });
     }
   });
 

@@ -1,3 +1,4 @@
+import { expect } from '@wdio/globals';
 import { BasePage } from './BasePage';
 
 export class HomePage extends BasePage {
@@ -50,7 +51,9 @@ export class HomePage extends BasePage {
   }
 
   async waitForPageLoad(): Promise<void> {
-    await this.menuButton.waitForDisplayed({ timeout: 15000 });
+    await expect(this.menuButton).toBeDisplayed({ 
+      message: 'Menu button should be displayed on home page' 
+    });
   }
 
   async openSemester(semester: 1 | 2 | 3 | 4 | 5 | 6): Promise<void> {

@@ -1,8 +1,11 @@
+import { expect } from '@wdio/globals';
 import { BasePage } from './BasePage';
 
 export class InterviewPage extends BasePage {
   async waitForPageLoad(): Promise<void> {
-    await this.menuButton.waitForDisplayed({ timeout: 15000 });
+    await expect(this.menuButton).toBeDisplayed({ 
+      message: 'Menu button should be displayed on interview page' 
+    });
   }
 
   // Dynamic selector - interview items use pattern: interview-item-{cleaned-title}-{index}

@@ -1,8 +1,11 @@
+import { expect } from '@wdio/globals';
 import { BasePage } from './BasePage';
 
 export class BlogPage extends BasePage {
   async waitForPageLoad(): Promise<void> {
-    await this.menuButton.waitForDisplayed({ timeout: 15000 });
+    await expect(this.menuButton).toBeDisplayed({ 
+      message: 'Menu button should be displayed on blog page' 
+    });
   }
 
   // Dynamic selector - blog items use pattern: blog-item-{cleaned-title}-{index}

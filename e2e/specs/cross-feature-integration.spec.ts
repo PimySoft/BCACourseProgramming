@@ -44,9 +44,7 @@ describe('Cross-Feature Integration Tests', () => {
   });
 
   afterEach(async () => {
-    // Clean up: return to home page after each test
-    // This ensures tests run in isolation
-    await homePage.navigateToHome();
+    await homePage.cleanup();
   });
 
   it('should navigate from home to blog and back', async () => {
