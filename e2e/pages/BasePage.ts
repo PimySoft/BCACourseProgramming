@@ -13,7 +13,15 @@ export class BasePage {
   }
 
   get menuButton() {
-    return this.driver.$('~menuButton');
+    return this.driver.$('android=new UiSelector().description("menuButton")');
+  }
+
+  get homeButton() {
+    return this.driver.$('android=new UiSelector().description("Semester1")');
+  }
+
+  get languageModalCloseButton() {
+    return this.driver.$('android=new UiSelector().description("languageModalCloseButton")');
   }
 
   async click(element: WebdriverIOElement, timeout: number = 10000): Promise<void> {
@@ -63,12 +71,7 @@ export class BasePage {
   }
 
   async isOnHomePage(): Promise<boolean> {
-    const homeButton = this.driver.$('~Semester1');
-    const exists = await homeButton.isExisting();
-    if (!exists) {
-      return false;
-    }
-    return await homeButton.isDisplayed();
+    return await this.isDisplayed(this.homeButton);
   }
 
   async navigateToHome(): Promise<void> {
@@ -80,72 +83,33 @@ export class BasePage {
 
     await this.driver.activateApp(APP_PACKAGE_NAME);
 
-    const homeButton = this.driver.$('~Semester1');
-    const maxBackPresses = 10;
-    
-    for (let i = 0; i < maxBackPresses; i++) {
-      if (await this.isOnHomePage()) {
-        await expect(homeButton).toBeDisplayed({ 
-          message: `Home page should be visible after ${i + 1} back button presses` 
-        });
-        return;
-      }
-      await this.driver.pressKeyCode(4);
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-
-    if (await this.isOnHomePage()) {
+    const homePageLoaded = await this.isOnHomePage();
+    if (homePageLoaded) {
       return;
     }
-    // Eccessive timeout to ensure home page is loaded. Team will need to improve performance.
-    await homeButton.waitForDisplayed({ timeout: 40000 });
+
+    await this.driver.pressKeyCode(4);
+    
+    // Excessive timeout to ensure home page is loaded. Team will need to improve performance.
+    await this.homeButton.waitForDisplayed({ timeout: 40000 });
   }
 
   async dismissLanguageModal(): Promise<void> {
-    const closeButton = this.driver.$('~languageModalCloseButton');
-    const exists = await closeButton.isExisting();
+    const exists = await this.languageModalCloseButton.isExisting();
     if (exists) {
-      await closeButton.waitForDisplayed({ timeout: 10000 });
-      await closeButton.click();
+      await this.languageModalCloseButton.waitForDisplayed({ timeout: 10000 });
+      await this.languageModalCloseButton.click();
     }
   }
 
+  // Resets app state by activating app (resets to main activity).
   async cleanup(): Promise<void> {
-    await this.hideKeyboard();
-    
-    const contexts = await this.driver.getContexts();
-    const currentContext = await this.driver.getContext();
-    if (contexts.length > 1 && currentContext !== 'NATIVE_APP') {
-      await this.driver.switchContext('NATIVE_APP');
-    }
+    await this.driver.activateApp(APP_PACKAGE_NAME);
+  }
 
-    if (await this.isOnHomePage()) {
-      return;
-    }
-
-    const cleanupTimeout = 15000;
-    const homeButton = this.driver.$('~Semester1');
-    
-    try {
-      await Promise.race([
-        this.navigateToHome(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Cleanup navigation timeout')), cleanupTimeout)
-        )
-      ]);
-    } catch (error) {
-      const isHome = await this.isOnHomePage();
-      if (!isHome) {
-        throw new Error(`Cleanup failed: Could not navigate to home page within ${cleanupTimeout}ms`);
-      }
-      return;
-    }
-
-    const isHome = await this.isOnHomePage();
-    if (!isHome) {
-      await expect(homeButton).toBeDisplayed({ 
-        message: 'Home page should be visible after cleanup navigation' 
-      });
-    }
+  async waitForPageLoad(): Promise<void> {
+    await expect(this.menuButton).toBeDisplayed({ 
+      message: 'Menu button should be displayed on page' 
+    });
   }
 }

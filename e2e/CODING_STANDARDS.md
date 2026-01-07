@@ -1,0 +1,460 @@
+# E2E Testing Coding Standards
+
+This document defines coding standards and best practices for maintaining the Appium E2E test suite. Follow these guidelines to ensure consistency and quality.
+
+---
+
+## 🎯 Core Principles
+
+1. **Clean Code First** - Remove unused code, unnecessary comments, and dead code immediately
+2. **Appium Best Practices** - Use Appium's native wait methods, avoid hardcoded delays
+3. **Platform Explicit** - All test commands must specify platform (Android/iOS)
+4. **Page Object Model** - All page interactions go through Page Objects
+5. **Type Safety** - Use TypeScript types throughout
+
+---
+
+## 📝 Code Quality Standards
+
+### ❌ Avoid These Patterns
+
+```typescript
+// ❌ BAD: Hardcoded delays
+await new Promise(resolve => setTimeout(resolve, 500));
+
+// ❌ BAD: Try-catch for wait operations
+try {
+  await element.waitForDisplayed({ timeout: 500 });
+} catch {
+  continue;
+}
+
+// ❌ BAD: Unnecessary wrapper functions
+static async wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// ❌ BAD: Obvious/redundant comments
+// Click the button
+await this.click(this.button);
+
+// ❌ BAD: Placeholder code that's never used
+getListItem(index: number) {
+  // Note: This is a placeholder - in practice, you'd...
+  return this.driver.$(`//*[contains(@content-desc, 'Item')][${index + 1}]`);
+}
+```
+
+### ✅ Preferred Patterns
+
+```typescript
+// ✅ GOOD: Use Appium wait methods directly
+await element.waitForDisplayed({ timeout: 5000 });
+await this.isDisplayed(element);
+
+
+// ✅ GOOD: Only comment when explaining WHY, not WHAT
+// Excessive timeout to ensure home page is loaded. Team will need to improve performance.
+await homeButton.waitForDisplayed({ timeout: 40000 });
+
+// ✅ GOOD: Clear, self-documenting code
+await homePage.openSemester(1);
+await semPage.waitForPageLoad();
+await expect(semPage.menuButton).toBeDisplayed();
+```
+
+---
+
+## 🏗️ Page Object Model Standards
+
+### BasePage Structure
+
+```typescript
+export class BasePage {
+  protected driver: Browser;
+
+  constructor(driver: Browser) {
+    this.driver = driver;
+  }
+
+  // Element getters (no 'get' prefix needed in getter name)
+  get menuButton() {
+    return this.driver.$('android=new UiSelector().description("menuButton")');
+  }
+
+  // Action methods (async, descriptive names)
+  async click(element: WebdriverIOElement, timeout: number = 10000): Promise<void> {
+    await element.waitForDisplayed({ timeout });
+    await element.click();
+  }
+
+  // Helper methods use Appium native methods
+  async isDisplayed(element: WebdriverIOElement): Promise<boolean> {
+    const exists = await element.isExisting();
+    if (!exists) {
+      return false;
+    }
+    return await element.isDisplayed();
+  }
+}
+```
+
+### Page Object Inheritance
+
+```typescript
+// ✅ GOOD: Extend BasePage, add page-specific elements/actions
+export class SemPage extends BasePage {
+  get notesTab() {
+    return this.driver.$('android=new UiSelector().description("Notes")');
+  }
+
+  async switchToNotesTab(): Promise<void> {
+    await this.click(this.notesTab);
+    await this.notesTab.waitForDisplayed({ timeout: 10000 });
+  }
+
+  async waitForPageLoad(): Promise<void> {
+    await this.dismissLanguageModal();
+    await expect(this.menuButton).toBeDisplayed({ 
+      message: 'Menu button should be displayed on semester page' 
+    });
+  }
+}
+```
+
+**Rules:**
+- All Page Objects extend `BasePage`
+- Use `waitForPageLoad()` for page initialization verification
+- Use descriptive error messages in assertions
+- Element selectors use UIAutomator selectors for Android (`android=new UiSelector().description("testID")`) for improved reliability during app transitions
+- Prefer accessibility labels when available, but UIAutomator is more reliable for dynamic content
+- Avoid XPATH
+- Add `~testID` and accessibility ID if necessary in the app
+
+---
+
+## 🧪 Test Structure Standards
+
+### Test File Organization
+
+```typescript
+import { expect } from '@wdio/globals';
+import { HomePage } from '../pages/HomePage';
+import { SemPage } from '../pages/SemPage';
+
+describe('Feature Name Tests', () => {
+  let homePage: HomePage;
+  let semPage: SemPage;
+
+  before(async () => {
+    homePage = new HomePage(driver);
+    semPage = new SemPage(driver);
+  });
+
+  beforeEach(async () => {
+    await homePage.dismissExternalApps();
+    await homePage.navigateToHome();
+    await homePage.waitForPageLoad();
+  });
+
+  afterEach(async () => {
+    await homePage.cleanup();
+  });
+
+  it('should perform specific action', async () => {
+    // Arrange - minimal setup
+    await homePage.openSemester(1);
+    await semPage.waitForPageLoad();
+
+    // Act
+    await semPage.switchToNotesTab();
+
+    // Assert - descriptive error messages
+    await expect(semPage.notesTab).toBeDisplayed({ 
+      message: 'Notes tab should be displayed after switching' 
+    });
+  });
+});
+```
+
+**Test Structure Rules:**
+- Use descriptive test names (`should...`)
+- Initialize page objects in `before()` hook
+- Use `beforeEach()` for test setup (navigate to home, dismiss modals)
+- Use `afterEach()` for cleanup
+- Keep tests focused on one behavior
+- Use descriptive error messages in assertions
+
+---
+
+## 🔍 Wait Strategies
+
+### ✅ Use Appium Wait Methods
+
+```typescript
+// ✅ GOOD: Explicit waits with timeouts
+await element.waitForDisplayed({ timeout: 10000 });
+
+// ✅ GOOD: Check conditions in loops
+for (let i = 0; i < maxAttempts; i++) {
+  if (await this.isOnHomePage()) {
+    return;
+  }
+  await this.driver.pressKeyCode(4);
+}
+
+// ✅ GOOD: Use isDisplayed() for conditional checks
+const isVisible = await this.isDisplayed(element);
+if (isVisible) {
+  await this.click(element);
+}
+```
+
+### ❌ Avoid These Wait Patterns
+
+```typescript
+// ❌ BAD: Hardcoded delays
+await new Promise(resolve => setTimeout(resolve, 500));
+
+// ❌ BAD: Try-catch for wait operations
+try {
+  await element.waitForDisplayed({ timeout: 500 });
+} catch {
+  // Handle timeout
+}
+
+// ❌ BAD: Wrapper functions for setTimeout
+static async wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+```
+
+**Wait Strategy Rules:**
+- Always use Appium's native wait methods
+- Use `waitForDisplayed()` for elements that should appear
+- Use `isDisplayed()` for conditional checks (returns boolean)
+- Let loop conditions handle retry logic
+- No try-catch for wait operations
+- Don't use `waitForClickable()` in native app, that's web only
+
+---
+
+## 📦 Utility Classes
+
+### Util.ts Standards
+
+```typescript
+export class Util {
+  // ✅ GOOD: Appium-specific utilities with fallbacks
+  static async swipeDown(driver: Browser): Promise<void> {
+    try {
+      await driver.execute('mobile: swipe', {
+        startX, startY, endX: startX, endY,
+        duration: 0.5,
+      });
+    } catch {
+      // Fallback to W3C performActions
+      await driver.performActions([...]);
+      await driver.releaseActions();
+    }
+  }
+
+  // ✅ GOOD: Utility methods that add value
+  static async hideKeyboard(driver: Browser): Promise<void> {
+    try {
+      await driver.hideKeyboard();
+    } catch {
+      // Keyboard not visible - acceptable to fail silently
+    }
+  }
+}
+```
+
+**Utility Rules:**
+- Only include utilities that add value beyond Appium native methods
+- Prefer Appium-specific commands (`mobile: swipe`) with fallbacks
+- Silent failures are acceptable for optional operations (keyboard)
+- Remove utilities that are never used
+
+---
+
+## 📁 File Organization
+
+### Directory Structure
+
+```
+e2e/
+├── pages/              # Page Object classes
+│   ├── BasePage.ts     # Base class (never instantiated directly)
+│   ├── HomePage.ts     # Feature-specific pages
+│   └── SemPage.ts
+├── specs/              # Test files (*.spec.ts)
+│   ├── home.spec.ts
+│   └── semester-content-flow.spec.ts
+├── utils/              # Utility classes
+│   └── Util.ts
+├── config/             # Configuration files
+│   └── constants.ts
+├── types/              # TypeScript type definitions
+│   └── driver.d.ts
+└── README.md           # User-facing documentation
+```
+
+**File Naming:**
+- Page Objects: `*Page.ts` (e.g., `HomePage.ts`, `SemPage.ts`)
+- Test Files: `*.spec.ts` (e.g., `home.spec.ts`)
+- Utilities: `*Util.ts` or descriptive names
+- Constants: `constants.ts` or `config.ts`
+
+---
+
+## 🎨 Naming Conventions
+
+### Variables and Methods
+
+```typescript
+// ✅ GOOD: Descriptive, camelCase
+const homePage = new HomePage(driver);
+const isOnHomePage = await this.isOnHomePage();
+async switchToNotesTab(): Promise<void>
+async waitForPageLoad(): Promise<void>
+
+// ❌ BAD: Abbreviations, unclear names
+const hp = new HomePage(driver);
+const home = await this.home();
+async switchTab(): Promise<void>
+async load(): Promise<void>
+```
+
+### Test IDs (Accessibility Labels)
+
+```typescript
+// ✅ GOOD: Descriptive, used in UIAutomator selectors
+'android=new UiSelector().description("menuButton")'
+'android=new UiSelector().description("Semester1")'
+'android=new UiSelector().description("button-start-now")'
+'android=new UiSelector().description("mcq-option-A-1")'
+
+// ❌ BAD: Vague, inconsistent
+'android=new UiSelector().description("btn")'
+'android=new UiSelector().description("sem1")'
+'android=new UiSelector().description("startBtn")'
+```
+
+---
+
+## 💬 Comments Standards
+
+### ❌ Don't Comment
+
+```typescript
+// ❌ BAD: Obvious/redundant
+// Click the button
+await this.click(this.button);
+
+// Navigate to semester
+await homePage.openSemester(1);
+
+// Wait is handled inside switchToNotesTab()
+await semPage.switchToNotesTab();
+```
+
+### ✅ Do Comment
+
+```typescript
+// ✅ GOOD: Explains WHY, not WHAT
+// Excessive timeout to ensure home page is loaded. Team will need to improve performance.
+await homeButton.waitForDisplayed({ timeout: 40000 });
+
+// ✅ GOOD: Documents non-obvious behavior
+// MainButton uses pattern: button-{title-lowercase-with-dashes}
+get startNowButton() {
+  return this.driver.$('~button-start-now');
+}
+```
+
+**Comment Rules:**
+- Remove obvious/redundant comments
+- Only comment when explaining WHY or non-obvious behavior
+- Remove placeholder comments for unused code
+- Delete commented-out code immediately
+
+---
+
+## 🧹 Code Cleanup Rules
+
+### Immediate Removal
+
+Remove these immediately when found:
+- [ ] Unused methods (defined but never called)
+- [ ] Unused imports
+- [ ] Placeholder methods marked as "not implemented"
+- [ ] Commented-out code
+- [ ] Obvious/redundant comments
+- [ ] Unused variables
+- [ ] Duplicate code
+
+### Review Before Removing
+
+- Methods that might be needed for future features
+- Complex logic that might be referenced elsewhere
+- Platform-specific code that might be needed for iOS
+- Selectors are with selectors, actions are with actions
+
+**When in doubt:** Ask or create an issue for review.
+
+---
+
+## 🔧 TypeScript Standards
+
+---
+
+## ✅ Error Messages
+
+### Assertion Messages
+
+```typescript
+// ✅ GOOD: Descriptive, includes context
+await expect(semPage.notesTab).toBeDisplayed({ 
+  message: 'Notes tab should be displayed after switching to Notes tab' 
+});
+
+await expect(homePage.semester1).toBeDisplayed({ 
+  message: 'Semester 1 card should be displayed on home page' 
+});
+
+// ❌ BAD: Generic or missing
+await expect(semPage.notesTab).toBeDisplayed();
+await expect(semPage.notesTab).toBeDisplayed({ message: 'Failed' });
+```
+
+**Error Message Rules:**
+- Always include descriptive error messages
+- Explain what should be true and the context
+- Use complete sentences
+
+---
+
+## 🚫 Common Anti-Patterns to Avoid
+
+1. **Hardcoded Delays** - Use Appium wait methods
+2. **Try-Catch for Waits** - Let conditions handle flow
+3. **Unused Code** - Remove immediately
+4. **Redundant Comments** - Code should be self-documenting
+5. **Generic Test Commands** - Always specify platform
+6. **Wrappers for Simple Operations** - Use Appium methods directly
+7. **Placeholder Code** - Remove or implement
+8. **Missing Error Messages** - Always provide context
+
+---
+
+## 📚 References
+
+- [WebdriverIO Best Practices](https://webdriver.io/docs/best-practices)
+- [Appium Documentation](https://appium.io/docs/en/latest/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+
+---
+
+**Remember:** Clean, maintainable code is more important than clever code. When in doubt, choose the simpler, more explicit solution.
+
