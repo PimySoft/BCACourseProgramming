@@ -1,11 +1,14 @@
-name: E2E Tests
+name: E2E Tests (Legacy - Local Emulator)
 
+# DISABLED: Replaced by ci-browserstack.yml which uses BrowserStack real devices
+# on:
+#   push:
+#     branches: [ main, master, develop ]
+#   pull_request:
+#     branches: [ main, master, develop ]
+#   workflow_dispatch:
 on:
-  push:
-    branches: [ main, master, develop ]
-  pull_request:
-    branches: [ main, master, develop ]
-  workflow_dispatch:
+  workflow_dispatch:  # Only manual runs allowed
 
 jobs:
   e2e-tests:
