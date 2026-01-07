@@ -26,28 +26,7 @@ export class BasePage {
 
   async click(element: WebdriverIOElement, timeout: number = 10000): Promise<void> {
     await element.waitForDisplayed({ timeout });
-    
-    // Use touch actions directly for BrowserStack compatibility
-    // BrowserStack sometimes doesn't register regular clicks on real devices
-    const location = await element.getLocation();
-    const size = await element.getSize();
-    const x = location.x + (size.width / 2);
-    const y = location.y + (size.height / 2);
-    
-    await this.driver.performActions([
-      {
-        type: 'pointer',
-        id: 'finger1',
-        parameters: { pointerType: 'touch' },
-        actions: [
-          { type: 'pointerMove', duration: 0, x: Math.round(x), y: Math.round(y) },
-          { type: 'pointerDown', button: 0 },
-          { type: 'pause', duration: 150 },
-          { type: 'pointerUp', button: 0 },
-        ],
-      },
-    ]);
-    await this.driver.releaseActions();
+    await element.click();
   }
 
   async isDisplayed(element: WebdriverIOElement): Promise<boolean> {
