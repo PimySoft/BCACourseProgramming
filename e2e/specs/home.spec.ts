@@ -18,16 +18,13 @@ describe('Home Page Tests', () => {
   });
 
   beforeEach(async () => {
-    // Dismiss any external apps (like Gmail) that might be open
     await homePage.dismissExternalApps();
-    // Ensure we start from home page for each test
     await homePage.navigateToHome();
     await homePage.waitForPageLoad();
   });
 
   afterEach(async () => {
-    // Clean up: return to home page after each test
-    await homePage.navigateToHome();
+    await homePage.cleanup();
   });
 
   it('should display home page elements', async () => {
@@ -40,19 +37,8 @@ describe('Home Page Tests', () => {
     });
   });
 
-  it.skip('should open navigation menu', async () => {
-    // Skipped: Opening menu triggers mailto: links (Report/Suggestions buttons)
-    // which open Gmail login dialog, adding unnecessary complexity for tech test
-    await homePage.openMenu();
-    // Verify menu opened - menu button should still be accessible
-    await expect(homePage.menuButton).toBeDisplayed({ 
-      message: 'Menu button should remain accessible after opening menu' 
-    });
-  });
-
   it('should navigate to blog page', async () => {
     await homePage.click(homePage.blog);
-    // Verify navigation to blog page
     await blogPage.waitForPageLoad();
     await expect(blogPage.menuButton).toBeDisplayed({ 
       message: 'Should navigate to blog page successfully' 
@@ -60,7 +46,6 @@ describe('Home Page Tests', () => {
   });
 
   it('should scroll on home page and maintain functionality', async () => {
-    // Verify initial state
     await expect(homePage.menuButton).toBeDisplayed({ 
       message: 'Menu button should be displayed before scrolling' 
     });
@@ -68,7 +53,6 @@ describe('Home Page Tests', () => {
     await homePage.swipeDown();
     await homePage.swipeUp();
     
-    // Verify page is still functional after scrolling
     await expect(homePage.menuButton).toBeDisplayed({ 
       message: 'Menu button should remain accessible after scrolling' 
     });
@@ -76,7 +60,6 @@ describe('Home Page Tests', () => {
 
   it('should navigate to compiler page', async () => {
     await homePage.click(homePage.compiler);
-    // Verify navigation to compiler page
     await compilerPage.waitForPageLoad();
     await expect(compilerPage.menuButton).toBeDisplayed({ 
       message: 'Should navigate to compiler page successfully' 
@@ -95,7 +78,6 @@ describe('Home Page Tests', () => {
 
   it('should navigate to semester 1 page', async () => {
     await homePage.openSemester(1);
-    // Verify navigation to semester page
     await semPage.waitForPageLoad();
     await expect(semPage.menuButton).toBeDisplayed({ 
       message: 'Should navigate to semester 1 page successfully' 

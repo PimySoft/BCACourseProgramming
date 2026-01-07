@@ -1,4 +1,5 @@
 import type { Browser } from 'webdriverio';
+import { expect } from '@wdio/globals';
 import { Util } from '../utils/Util';
 import { APP_PACKAGE_NAME } from '../config/constants';
 
@@ -12,7 +13,15 @@ export class BasePage {
   }
 
   get menuButton() {
-    return this.driver.$('~menuButton');
+    return this.driver.$('android=new UiSelector().description("menuButton")');
+  }
+
+  get homeButton() {
+    return this.driver.$('android=new UiSelector().description("Semester1")');
+  }
+
+  get languageModalCloseButton() {
+    return this.driver.$('android=new UiSelector().description("languageModalCloseButton")');
   }
 
   async click(element: WebdriverIOElement, timeout: number = 10000): Promise<void> {
@@ -21,11 +30,11 @@ export class BasePage {
   }
 
   async isDisplayed(element: WebdriverIOElement): Promise<boolean> {
-    try {
-      return await element.isDisplayed();
-    } catch {
+    const exists = await element.isExisting();
+    if (!exists) {
       return false;
     }
+    return await element.isDisplayed();
   }
 
   async swipeDown(): Promise<void> {
@@ -45,67 +54,62 @@ export class BasePage {
   }
 
   async dismissExternalApps(): Promise<void> {
-    try {
-      const currentPackage = await this.driver.getCurrentPackage();
-      if (currentPackage && currentPackage.includes('gmail')) {
-        await this.driver.pressKeyCode(4);
-        await this.driver.activateApp(APP_PACKAGE_NAME);
-        return;
-      }
+    const currentPackage = await this.driver.getCurrentPackage();
+    if (currentPackage && currentPackage.includes('gmail')) {
+      await this.driver.pressKeyCode(4);
+      await this.driver.activateApp(APP_PACKAGE_NAME);
+      return;
+    }
 
-      const contexts = await this.driver.getContexts();
-      const currentContext = await this.driver.getContext();
-      if (contexts.length > 1 && currentContext !== 'NATIVE_APP') {
-        await this.driver.switchContext('NATIVE_APP');
-        await this.driver.pressKeyCode(4);
-        await this.driver.activateApp(APP_PACKAGE_NAME);
-      }
-    } catch (error) {
-      try {
-        await this.driver.activateApp(APP_PACKAGE_NAME);
-      } catch {
-        // Ignore
-      }
+    const contexts = await this.driver.getContexts();
+    const currentContext = await this.driver.getContext();
+    if (contexts.length > 1 && currentContext !== 'NATIVE_APP') {
+      await this.driver.switchContext('NATIVE_APP');
+      await this.driver.pressKeyCode(4);
+      await this.driver.activateApp(APP_PACKAGE_NAME);
     }
   }
 
+  async isOnHomePage(): Promise<boolean> {
+    return await this.isDisplayed(this.homeButton);
+  }
+
   async navigateToHome(): Promise<void> {
-    try {
-      await this.dismissExternalApps();
-
-      const homeButton = this.driver.$('~Semester1');
-      const isHomePage = await this.isDisplayed(homeButton);
-      
-      if (isHomePage) {
-        await homeButton.waitForDisplayed({ timeout: 5000 });
-        return;
-      }
-
-      for (let i = 0; i < 10; i++) {
-        await this.driver.pressKeyCode(4);
-        
-        try {
-          await homeButton.waitForDisplayed({ timeout: 2000 });
-          const isNowHome = await this.isDisplayed(homeButton);
-          if (isNowHome) {
-            return;
-          }
-        } catch {
-          // Continue
-        }
-      }
-
-      await this.driver.activateApp(APP_PACKAGE_NAME);
-      await homeButton.waitForDisplayed({ timeout: 10000 });
-    } catch (error) {
-      console.log('Navigation to home failed, attempting app reactivation');
-      try {
-        await this.driver.activateApp(APP_PACKAGE_NAME);
-        const homeButton = this.driver.$('~Semester1');
-        await homeButton.waitForDisplayed({ timeout: 10000 });
-      } catch (reactivateError) {
-        throw new Error(`Failed to navigate to home page: ${reactivateError instanceof Error ? reactivateError.message : String(reactivateError)}`);
-      }
+    await this.dismissExternalApps();
+    
+    if (await this.isOnHomePage()) {
+      return;
     }
+
+    await this.driver.activateApp(APP_PACKAGE_NAME);
+
+    const homePageLoaded = await this.isOnHomePage();
+    if (homePageLoaded) {
+      return;
+    }
+
+    await this.driver.pressKeyCode(4);
+    
+    // Excessive timeout to ensure home page is loaded. Team will need to improve performance.
+    await this.homeButton.waitForDisplayed({ timeout: 40000 });
+  }
+
+  async dismissLanguageModal(): Promise<void> {
+    const exists = await this.languageModalCloseButton.isExisting();
+    if (exists) {
+      await this.languageModalCloseButton.waitForDisplayed({ timeout: 10000 });
+      await this.languageModalCloseButton.click();
+    }
+  }
+
+  // Resets app state by activating app (resets to main activity).
+  async cleanup(): Promise<void> {
+    await this.driver.activateApp(APP_PACKAGE_NAME);
+  }
+
+  async waitForPageLoad(): Promise<void> {
+    await expect(this.menuButton).toBeDisplayed({ 
+      message: 'Menu button should be displayed on page' 
+    });
   }
 }

@@ -25,7 +25,7 @@ export const config: Options.Testrunner = {
       'appium:appActivity': 'com.bcafresh.MainActivity',
       'appium:automationName': 'UiAutomator2',
       'appium:noReset': false,
-      'appium:fullReset': true, // Clear app data to avoid update modals
+      'appium:fullReset': false, // Using activateApp in cleanup instead for better performance
       'appium:newCommandTimeout': 300,
       'appium:connectHardwareKeyboard': true,
     }
@@ -76,10 +76,6 @@ export const config: Options.Testrunner = {
     timeout: 60000
   },
   
-  before: async function (capabilities, specs) {
-    // Add any setup before tests run
-  },
-  
   beforeSpec: async function (spec, capabilities) {
     // Add any setup before each spec
   },
@@ -115,10 +111,6 @@ export const config: Options.Testrunner = {
         console.error(`❌ Failed to take screenshot: ${screenshotError}`);
       }
     }
-  },
-  
-  after: async function (result, capabilities, specs) {
-    // Add any cleanup after all tests
   },
   
   onComplete: function(exitCode, config, capabilities, results) {

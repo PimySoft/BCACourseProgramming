@@ -774,6 +774,8 @@ const Home = props => {
         </View> */}
 
         <View
+          testID="homePageContent"
+          accessibilityLabel="Home page content"
           style={{
             flexDirection: 'row',
             flexWrap: 'wrap',
@@ -784,6 +786,7 @@ const Home = props => {
         >
           <Card
             testID="Semester1"
+            accessibilityRole="button"
             onCardPress={() => handleCardClick('Sem1')}
             titleNum={'1'}
             title={Constants?.st}
