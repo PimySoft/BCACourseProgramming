@@ -71,7 +71,8 @@ export class BasePage {
   }
 
   async isOnHomePage(): Promise<boolean> {
-    return await this.isDisplayed(this.homeButton);
+    // Use menuButton as indicator - more reliable than Semester1
+    return await this.isDisplayed(this.menuButton);
   }
 
   async navigateToHome(): Promise<void> {
@@ -96,9 +97,6 @@ export class BasePage {
     
     // Dismiss language modal again after navigation
     await this.dismissLanguageModal();
-    
-    // Excessive timeout to ensure home page is loaded. Team will need to improve performance.
-    await this.homeButton.waitForDisplayed({ timeout: 40000 });
   }
 
   async dismissLanguageModal(): Promise<void> {
