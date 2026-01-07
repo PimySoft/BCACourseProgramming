@@ -26,34 +26,7 @@ export class BasePage {
 
   async click(element: WebdriverIOElement, timeout: number = 10000): Promise<void> {
     await element.waitForDisplayed({ timeout });
-    
-    // Dismiss language modal if present (can block interactions on BrowserStack)
-    await this.dismissLanguageModal();
-    
-    // Use touch actions directly for BrowserStack compatibility
-    // BrowserStack sometimes doesn't register regular clicks on real devices
-    const location = await element.getLocation();
-    const size = await element.getSize();
-    const x = location.x + (size.width / 2);
-    const y = location.y + (size.height / 2);
-    
-    await this.driver.performActions([
-      {
-        type: 'pointer',
-        id: 'finger1',
-        parameters: { pointerType: 'touch' },
-        actions: [
-          { type: 'pointerMove', duration: 0, x: Math.round(x), y: Math.round(y) },
-          { type: 'pointerDown', button: 0 },
-          { type: 'pause', duration: 150 },
-          { type: 'pointerUp', button: 0 },
-        ],
-      },
-    ]);
-    await this.driver.releaseActions();
-    
-    // Small pause after click to let UI respond
-    await this.driver.pause(300);
+    await element.click();
   }
 
   async isDisplayed(element: WebdriverIOElement): Promise<boolean> {
@@ -105,14 +78,10 @@ export class BasePage {
     await this.dismissExternalApps();
     
     if (await this.isOnHomePage()) {
-      await this.dismissLanguageModal();
       return;
     }
 
     await this.driver.activateApp(APP_PACKAGE_NAME);
-    
-    // Dismiss language modal that may appear on fresh installs (BrowserStack)
-    await this.dismissLanguageModal();
 
     const homePageLoaded = await this.isOnHomePage();
     if (homePageLoaded) {
@@ -120,9 +89,6 @@ export class BasePage {
     }
 
     await this.driver.pressKeyCode(4);
-    
-    // Dismiss language modal again after navigation
-    await this.dismissLanguageModal();
     
     // Excessive timeout to ensure home page is loaded. Team will need to improve performance.
     await this.homeButton.waitForDisplayed({ timeout: 40000 });

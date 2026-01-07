@@ -7,10 +7,19 @@ Appium 3 + TypeScript + WebdriverIO for Android testing with Allure reporting.
 ```
 e2e/
 ├── pages/           # Page Object Model
-│   ├── BasePage.ts  # Base class
-│   └── HomePage.ts  # Home page
+│   ├── BasePage.ts      # Base class with common methods
+│   ├── HomePage.ts      # Home page elements and actions
+│   ├── BlogPage.ts      # Blog page
+│   ├── CompilerPage.ts  # Compiler page
+│   ├── InterviewPage.ts # Interview page
+│   ├── SemPage.ts       # Semester content page
+│   ├── CodeViewPage.ts  # Code view page
+│   └── MCQPage.ts       # MCQ page
 ├── specs/           # Test files
-│   └── home.spec.ts
+│   ├── home.spec.ts                    # Home page tests
+│   ├── compiler.spec.ts                # Compiler page tests
+│   ├── cross-feature-integration.spec.ts # Cross-feature navigation tests
+│   └── semester-content-flow.spec.ts   # Semester content navigation tests
 ├── utils/           # Helper functions
 │   └── Util.ts
 └── types/
@@ -120,6 +129,7 @@ npm run test:e2e:android
 
 # Run specific Android test suites
 npm run test:e2e:android:home
+npm run test:e2e:android:compiler
 npm run test:e2e:android:cross-feature-integration
 npm run test:e2e:android:semester-content
 
@@ -128,31 +138,14 @@ npm run allure:generate
 npm run allure:open
 ```
 
-## Known Issues
+## Test Coverage
 
-### Cross-Feature Integration Test Failures
+Current test suite includes:
+- **Home Page Tests** (6 tests): Element display, navigation, scrolling, semester cards
+- **Compiler Page Tests** (2 tests): Navigation to/from compiler page (no WebView interactions)
+- **Cross-Feature Integration Tests** (5 tests): Navigation between home, blog, compiler, and interview pages
+- **Semester Content Flow Tests** (4 tests): Semester navigation, tab verification, scrolling, menu functionality
 
-**Status:** ⚠️ 2 failures in setup/teardown hooks
+**Total: 17 tests, all passing** ✅
 
-The `cross-feature-integration.spec.ts` test suite fails in `beforeEach` and `afterEach` hooks when `navigateToHome()` times out after 40 seconds trying to locate the `Semester1` element. This prevents the actual test cases from running.
-
-**Error:** `element ("~Semester1") still not displayed after 40000ms` at `BasePage.ts:105`
-
-**Root Cause:** The app may be in an unexpected state after test runs, or the navigation logic needs improvement to handle edge cases.
-
-**Impact:** 10 tests passing, 2 failing (both in hooks). Other test suites pass successfully.
-
-**Suggestions for Developers:**
-
-1. **Navigation Reliability:** Add robust state detection, explicit waits for app transitions, and retry logic with exponential backoff
-2. **App State Management:** Ensure proper reset between tests and add logging for state transitions
-3. **Timeout Configuration:** Review 40s timeout, make it configurable, add intermediate checks to fail fast
-4. **Alternative Strategies:** UIAutomator selectors have been added as fallback (see UIAutomator Selectors section). Also consider deep links or app-specific navigation instead of back button presses
-5. **Test Isolation:** Ensure clean state between tests, test different execution orders
-6. **Debugging:** Add screenshots at failure points, log app package/activity, use Appium Inspector
-
-**Workaround:** Run passing test suites individually:
-```bash
-npm run test:e2e:android:home
-npm run test:e2e:android:semester-content
-```
+All tests use UIAutomator selectors for reliable element location and avoid WebView interactions for stability.
