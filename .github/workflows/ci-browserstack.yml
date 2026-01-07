@@ -44,11 +44,26 @@ jobs:
         run: npm ci
 
       - name: 🔨 Build Android APK
+        timeout-minutes: 20
         run: |
-          cd android && ./gradlew assembleDebug && cd ..
+          cd android
+          chmod +x gradlew
+          echo "Starting Gradle build (this may take 5-10 minutes for first build)..."
+          ./gradlew assembleDebug --no-daemon --stacktrace || {
+            echo "Build failed, checking logs..."
+            exit 1
+          }
+          echo "Build completed successfully"
+          if [ ! -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo "ERROR: APK not found after build!"
+            exit 1
+          fi
+          ls -lh app/build/outputs/apk/debug/
+          cd ..
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false"
 
       - name: 🧪 Run E2E Tests on BrowserStack
         run: npm run test:e2e:browserstack:all
