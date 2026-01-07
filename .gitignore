@@ -92,6 +92,14 @@ metro-health-check*
 # Testing & Coverage
 # ===============================
 /coverage
+/e2e/logs
+/e2e/test-results
+/e2e/inspector-capabilities-ready.json
+/logs
+/test-results
+/screenshots
+/allure-results
+/allure-report
 
 # ===============================
 # Misc / Temp / Local

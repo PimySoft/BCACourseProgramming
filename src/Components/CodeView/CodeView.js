@@ -176,6 +176,9 @@ const CodeView = props => {
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={copyToClipboard}
+              testID="copyButton"
+              accessibilityLabel="Copy code"
+              accessible={true}
               style={styles?.bookmarkContainer}
             >
               <Icons

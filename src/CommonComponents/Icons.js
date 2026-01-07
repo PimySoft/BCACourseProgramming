@@ -638,15 +638,16 @@ const Icons = ({
       ),
     },
   };
+  const { testID, ...svgProps } = otherProps;
   return (
-    <View pointerEvents="none">
+    <View pointerEvents="none" testID={testID}>
       <Svg
         width={width || graphics[name].width}
         height={height || graphics[name].height}
         viewBox={viewBox || graphics[name].viewBox}
         x={0}
         y={0}
-        {...otherProps}
+        {...svgProps}
       >
         {graphics[name].content}
       </Svg>

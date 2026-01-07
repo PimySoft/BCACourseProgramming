@@ -82,8 +82,8 @@ android {
         applicationId "technark.bca_courprogramming"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 117
-        versionName "10.86"
+        versionCode 118
+        versionName "10.88"
     }
     signingConfigs {
         debug {

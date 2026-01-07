@@ -336,7 +336,7 @@ const Home = props => {
             {Constants?.ratingMessage}
           </Text>
 
-          <MainButton title="Rate Now" mainButtonPress={() => rateNow()} />
+          <MainButton testID="rateNowButton" title="Rate Now" mainButtonPress={() => rateNow()} />
         </View>
       </View>
     );
@@ -438,7 +438,7 @@ const Home = props => {
             renderItem={({ item }) => RenderUpdateList(item)}
           />
 
-          <MainButton title="Update Now" mainButtonPress={() => updateNow()} />
+          <MainButton testID="updateNowButton" title="Update Now" mainButtonPress={() => updateNow()} />
 
           {forcedUpdate === false ? null : (
             <View
@@ -783,6 +783,7 @@ const Home = props => {
           }}
         >
           <Card
+            testID="Semester1"
             onCardPress={() => handleCardClick('Sem1')}
             titleNum={'1'}
             title={Constants?.st}
@@ -797,6 +798,7 @@ const Home = props => {
           />
 
           <Card
+            testID="Semester2"
             onCardPress={() => handleCardClick('Sem2')}
             titleNum={'2'}
             title={Constants?.nd}
@@ -811,6 +813,7 @@ const Home = props => {
           />
 
           <Card
+            testID="Semester3"
             onCardPress={() => handleCardClick('Sem3')}
             titleNum={'3'}
             title={Constants?.rd}
@@ -826,6 +829,7 @@ const Home = props => {
           />
 
           <Card
+            testID="Semester4"
             onCardPress={() => handleCardClick('Sem4')}
             titleNum={'4'}
             title={Constants?.th}
@@ -840,6 +844,7 @@ const Home = props => {
           />
 
           <Card
+            testID="Semester5"
             onCardPress={() => handleCardClick('Sem5')}
             titleNum={'5'}
             title={Constants?.th}
@@ -854,6 +859,7 @@ const Home = props => {
           />
 
           <Card
+            testID="Semester6"
             onCardPress={() => handleCardClick('Sem6')}
             titleNum={'6'}
             title={Constants?.th}
@@ -896,6 +902,7 @@ const Home = props => {
           /> */}
 
           <Card
+            testID="Interview"
             onCardPress={() => handleCardClick('Interview')}
             newTitle={Constants?.interviewQuestions}
             localImage={require('../../Assets/Images/interview_girl.png')}
@@ -909,6 +916,7 @@ const Home = props => {
           />
 
           <Card
+            testID="Blog"
             onCardPress={() => handleCardClick('Blog')}
             newTitle={Constants?.guidance}
             localImage={require('../../Assets/Images/blog_girl.png')}
@@ -923,6 +931,7 @@ const Home = props => {
           />
 
           <Card
+            testID="Compiler"
             onCardPress={() => handleCardClick('Compiler')}
             newTitle={Constants?.compiler}
             localImage={require('../../Assets/Images/compiler_boy.png')}
@@ -936,6 +945,7 @@ const Home = props => {
           />
 
           <Card
+            testID="RateUs"
             onCardPress={() => handleCardClick('RateUs')}
             newTitle={Constants?.rateUs}
             localImage={require('../../Assets/Images/rateus_boy.png')}
@@ -949,6 +959,7 @@ const Home = props => {
           />
 
           <Card
+            testID="Share"
             onCardPress={() => handleCardClick('Share')}
             newTitle={Constants?.shareWithFriends}
             localImage={require('../../Assets/Images/share_triplet.png')}
@@ -962,6 +973,7 @@ const Home = props => {
           />
 
           <Card
+            testID="Contribute"
             onCardPress={() => handleCardClick('Contribute')}
             newTitle={Constants?.contribute}
             localImage={require('../../Assets/Images/recommendations_boy.png')}
@@ -1027,9 +1039,10 @@ const Home = props => {
         <NewsInformation />
       </RBSheet>
 
-      <Modal animationType="fade" transparent={true} visible={updateModal}>
+      {/* Update modal disabled - commented out to prevent popup from appearing */}
+      {/* <Modal animationType="fade" transparent={true} visible={updateModal}>
         <VersionUpdateModal />
-      </Modal>
+      </Modal> */}
 
       <Modal animationType="fade" transparent={true} visible={reviewModal}>
         <RateReviewModal />

@@ -9,6 +9,7 @@ import {
   Modal,
   Image,
   BackHandler,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 // import SyntaxHighlighter from 'react-native-syntax-highlighter';
@@ -232,6 +233,9 @@ const MCQ = props => {
     return (
       <Pressable
         onPress={() => onIndexClick(item?.id)}
+        testID={`mcq-question-${item?.id + 1}`}
+        accessibilityLabel={`Question ${item?.id + 1}`}
+        accessible={true}
         style={{
           height: 50,
           width: 50,
@@ -310,6 +314,9 @@ const MCQ = props => {
 
         <Pressable
           onPress={() => manageSelection('A', index)}
+          testID={`mcq-option-A-${index}`}
+          accessibilityLabel={`Option A: ${item?.A}`}
+          accessible={true}
           style={[
             styles?.optionsContainer,
             {
@@ -345,6 +352,9 @@ const MCQ = props => {
 
         <Pressable
           onPress={() => manageSelection('B', index)}
+          testID={`mcq-option-B-${index}`}
+          accessibilityLabel={`Option B: ${item?.B}`}
+          accessible={true}
           style={[
             styles?.optionsContainer,
             {
@@ -380,6 +390,9 @@ const MCQ = props => {
 
         <Pressable
           onPress={() => manageSelection('C', index)}
+          testID={`mcq-option-C-${index}`}
+          accessibilityLabel={`Option C: ${item?.C}`}
+          accessible={true}
           style={[
             styles?.optionsContainer,
             {
@@ -415,6 +428,9 @@ const MCQ = props => {
 
         <Pressable
           onPress={() => manageSelection('D', index)}
+          testID={`mcq-option-D-${index}`}
+          accessibilityLabel={`Option D: ${item?.D}`}
+          accessible={true}
           style={[
             styles?.optionsContainer,
             {
@@ -539,20 +555,28 @@ const MCQ = props => {
           alignItems: 'center',
         }}
       >
-        <Text
+        <TouchableOpacity
           onPress={() => endQuiz()}
+          testID="mcqExit"
+          accessibilityLabel="Exit quiz"
+          accessible={true}
           style={{
             position: 'absolute',
             left: 10,
             top: 10,
             padding: 10,
-            color: Colors?.WHITE,
-            fontFamily: Fonts?.openSansRegular,
-            fontSize: 16,
           }}
         >
-          Exit
-        </Text>
+          <Text
+            style={{
+              color: Colors?.WHITE,
+              fontFamily: Fonts?.openSansRegular,
+              fontSize: 16,
+            }}
+          >
+            Exit
+          </Text>
+        </TouchableOpacity>
         <View
           style={{
             backgroundColor: Colors?.darkPurple,

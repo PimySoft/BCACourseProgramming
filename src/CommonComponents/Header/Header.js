@@ -85,6 +85,9 @@ const Header = props => {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => toggleDrawer()}
+          testID="menuButton"
+          accessibilityLabel="menuButton"
+          accessible={true}
           style={styles?.hamContainer}
         >
           <Icons

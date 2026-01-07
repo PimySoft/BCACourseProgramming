@@ -18,6 +18,8 @@ const Menubar = props => {
 
   return (
     <SafeAreaView
+      testID="drawer"
+      accessibilityLabel="drawer"
       style={[
         styles?.mainContainer,
         {
@@ -28,6 +30,8 @@ const Menubar = props => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => closeButton()}
+        testID="closeDrawer"
+        accessibilityLabel="Close drawer"
         style={[
           styles?.crossIconStyle,
           {

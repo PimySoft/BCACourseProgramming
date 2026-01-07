@@ -63,9 +63,22 @@ const RowContainer = props => {
     }
   };
 
+  // Generate testID from buttonText if not provided
+  const getTestID = () => {
+    if (props?.testID) return props.testID;
+    if (props?.buttonText) {
+      // Use buttonText as testID, converting to camelCase
+      return props.buttonText.replace(/[^a-zA-Z0-9]/g, '');
+    }
+    return 'rowContainer';
+  };
+
   return (
     <TouchableOpacity
       activeOpacity={0.8}
+      testID={getTestID()}
+      accessibilityLabel={props?.titleText || props?.buttonText || 'Menu Item'}
+      accessible={true}
       style={styles?.rowStyle}
       onPress={() => handleButtonClick(props?.buttonText)}
     >

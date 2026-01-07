@@ -4,12 +4,27 @@ import { Constants, Colors } from "../../Utils";
 import InterviewStyles from "./styles";
 import { useTheme } from "@react-navigation/native";
 
+// Helper function to clean and generate testID from title
+const cleanTestID = (str) => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .substring(0, 50); // Limit length
+};
+
 const InterviewFlatList = ({ item, index, handleItemClick }) => {
   const theme = useTheme()?.colors;
+  const testID = `interview-item-${cleanTestID(item?.title)}-${index}`;
+  const accessibilityLabel = item?.title || `Interview question ${index + 1}`;
 
   return (
     <TouchableOpacity
       onPress={() => handleItemClick(item)}
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+      accessible={true}
       style={{
         flex: 1,
         marginVertical: 10,
