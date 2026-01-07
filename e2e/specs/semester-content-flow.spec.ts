@@ -82,7 +82,7 @@ describe('Semester Content Navigation Flow', () => {
 
       await semPage.navigateToHome();
       await homePage.waitForPageLoad();
-      await homePage.semester1.waitForDisplayed({ timeout: 10000 });
+      await homePage.getSemester(1).waitForDisplayed({ timeout: 10000 });
     }
   });
 

@@ -101,11 +101,11 @@ describe('Cross-Feature Integration Tests', () => {
       message: 'Interview button should be displayed on home page' 
     });
 
-    await expect(homePage.semester1).toBeDisplayed({ 
+    await expect(homePage.getSemester(1)).toBeDisplayed({ 
       message: 'Semester 1 card should be displayed on home page' 
     });
 
-    await expect(homePage.semester2).toBeDisplayed({ 
+    await expect(homePage.getSemester(2)).toBeDisplayed({ 
       message: 'Semester 2 card should be displayed on home page' 
     });
   });

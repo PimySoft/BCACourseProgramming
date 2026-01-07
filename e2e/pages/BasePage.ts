@@ -76,22 +76,12 @@ export class BasePage {
 
   async navigateToHome(): Promise<void> {
     await this.dismissExternalApps();
-    
-    if (await this.isOnHomePage()) {
-      return;
-    }
-
     await this.driver.activateApp(APP_PACKAGE_NAME);
-
-    const homePageLoaded = await this.isOnHomePage();
-    if (homePageLoaded) {
-      return;
-    }
-
-    await this.driver.pressKeyCode(4);
     
-    // Excessive timeout to ensure home page is loaded. Team will need to improve performance.
-    await this.homeButton.waitForDisplayed({ timeout: 40000 });
+    if (!(await this.isOnHomePage())) {
+      await this.driver.pressKeyCode(4);
+      await this.homeButton.waitForDisplayed({ timeout: 10000 });
+    }
   }
 
   async dismissLanguageModal(): Promise<void> {
