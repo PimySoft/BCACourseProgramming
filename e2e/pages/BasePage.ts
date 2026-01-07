@@ -13,15 +13,15 @@ export class BasePage {
   }
 
   get menuButton() {
-    return this.driver.$('android=new UiSelector().description("menuButton")');
+    return this.driver.$('~menuButton');
   }
 
   get homeButton() {
-    return this.driver.$('android=new UiSelector().description("Semester1")');
+    return this.driver.$('~Semester1');
   }
 
   get languageModalCloseButton() {
-    return this.driver.$('android=new UiSelector().description("languageModalCloseButton")');
+    return this.driver.$('~languageModalCloseButton');
   }
 
   async click(element: WebdriverIOElement, timeout: number = 10000): Promise<void> {

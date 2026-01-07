@@ -2,51 +2,51 @@ import { BasePage } from './BasePage';
 
 export class HomePage extends BasePage {
   get semester1() {
-    return this.driver.$('android=new UiSelector().description("Semester1")');
+    return this.driver.$('~Semester1');
   }
 
   get semester2() {
-    return this.driver.$('android=new UiSelector().description("Semester2")');
+    return this.driver.$('~Semester2');
   }
 
   get semester3() {
-    return this.driver.$('android=new UiSelector().description("Semester3")');
+    return this.driver.$('~Semester3');
   }
 
   get semester4() {
-    return this.driver.$('android=new UiSelector().description("Semester4")');
+    return this.driver.$('~Semester4');
   }
 
   get semester5() {
-    return this.driver.$('android=new UiSelector().description("Semester5")');
+    return this.driver.$('~Semester5');
   }
 
   get semester6() {
-    return this.driver.$('android=new UiSelector().description("Semester6")');
+    return this.driver.$('~Semester6');
   }
 
   get interview() {
-    return this.driver.$('android=new UiSelector().description("Interview")');
+    return this.driver.$('~Interview');
   }
 
   get blog() {
-    return this.driver.$('android=new UiSelector().description("Blog")');
+    return this.driver.$('~Blog');
   }
 
   get compiler() {
-    return this.driver.$('android=new UiSelector().description("Compiler")');
+    return this.driver.$('~Compiler');
   }
 
   get rateUs() {
-    return this.driver.$('android=new UiSelector().description("RateUs")');
+    return this.driver.$('~RateUs');
   }
 
   get share() {
-    return this.driver.$('android=new UiSelector().description("Share")');
+    return this.driver.$('~Share');
   }
 
   get contribute() {
-    return this.driver.$('android=new UiSelector().description("Contribute")');
+    return this.driver.$('~Contribute');
   }
 
   async openSemester(semester: 1 | 2 | 3 | 4 | 5 | 6): Promise<void> {
