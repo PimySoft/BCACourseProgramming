@@ -34,43 +34,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: 📱 Setup Android SDK
-        run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          export ANDROID_SDK_ROOT=$HOME/android-sdk
-          
-          mkdir -p $ANDROID_HOME
-          cd $ANDROID_HOME
-          
-          # Download and install command line tools
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip
-          mkdir -p cmdline-tools/latest
-          mv cmdline-tools/* latest/ 2>/dev/null || true
-          mv latest cmdline-tools/ 2>/dev/null || true
-          
-          # Set PATH for sdkmanager
-          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
-          
-          # Verify sdkmanager is accessible
-          if ! command -v sdkmanager &> /dev/null; then
-            echo "sdkmanager not found, trying direct path..."
-            $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version || {
-              echo "ERROR: sdkmanager still not found"
-              ls -la $ANDROID_HOME/cmdline-tools/latest/bin/ || echo "Directory doesn't exist"
-              exit 1
-            }
-          fi
-          
-          # Accept licenses
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          
-          # Install required packages
-          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "ndk;27.1.12297006"
-          
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
-          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+        uses: android-actions/setup-android@v2
 
       - name: 📥 Install dependencies
         run: npm ci
