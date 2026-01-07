@@ -52,7 +52,6 @@ export const config: Options.Testrunner = {
         consoleLogs: browserstackConfig.consoleLogs,
         video: browserstackConfig.video,
         local: browserstackConfig.local,
-        appiumVersion: '3.0.0',
         idleTimeout: 300,
       },
       platformName: deviceConfig.platformName,
