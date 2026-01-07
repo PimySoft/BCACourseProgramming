@@ -27,9 +27,6 @@ export class BasePage {
   async click(element: WebdriverIOElement, timeout: number = 10000): Promise<void> {
     await element.waitForDisplayed({ timeout });
     
-    // Dismiss language modal if present (can block interactions on BrowserStack)
-    await this.dismissLanguageModal();
-    
     // Use touch actions directly for BrowserStack compatibility
     // BrowserStack sometimes doesn't register regular clicks on real devices
     const location = await element.getLocation();
@@ -51,9 +48,6 @@ export class BasePage {
       },
     ]);
     await this.driver.releaseActions();
-    
-    // Small pause after click to let UI respond
-    await this.driver.pause(300);
   }
 
   async isDisplayed(element: WebdriverIOElement): Promise<boolean> {
