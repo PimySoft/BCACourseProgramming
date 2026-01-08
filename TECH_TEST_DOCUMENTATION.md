@@ -53,17 +53,19 @@ The app includes:
 - **Cross-Feature Integration** (5 tests): Navigation between home, blog, compiler, interview pages
 - **Semester Content Flow** (4 tests): Semester navigation, tab switching, scrolling, menu functionality
 
+**Note**: **testIDs were added to the React Native app** as part of E2E testing setup. However, **UIAutomator selectors proved more reliable** during app transitions and dynamic rendering, so often the test suite uses UIAutomator selectors.
+
 ## Automation Tests
 
 ### Framework: Appium + WebdriverIO + TypeScript
 
 **Architecture**: Page Object Model (POM) pattern with TypeScript
 
-**Element Selection**: Accessibility IDs (testID) with UIAutomator2 fallbacks
+**Element Selection**: UIAutomator2 selectors (primary) with accessibility ID (testID) fallbacks
 
 ### Development Process
 
-The test suite was developed using **Cursor AI** with an iterative, incremental approach:
+The test suite was developed using **Cursor AI** with an iterative, incremental approach, and traditional coding:
 
 1. **Small Progressive Increments**: Each feature was built in small, focused increments (e.g., single page object, individual test case, specific utility method)
 
@@ -115,6 +117,7 @@ A comprehensive coding standards document was created and maintained in **`.curs
 - Can be flaky without proper wait strategies
 - Resource intensive (requires Appium server)
 - WebView interactions are complex
+- BrowserStack compatibility issues with selectors and interactions
 
 ### Mitigation
 - Automatic animation disabling for faster tests
@@ -122,6 +125,34 @@ A comprehensive coding standards document was created and maintained in **`.curs
 - UIAutomator2 fallbacks for element location
 - Screenshot capture on failures
 - WebView interactions avoided for stability
+
+## Performance Issues Identified Through Testing
+
+**Flaky test behavior revealed critical homepage performance issues** that impacted both test reliability and BrowserStack cloud testing feasibility.
+
+### Issues Discovered
+
+1. **Slow Initial Load**: Homepage requires up to 40 seconds to fully load (test suite needed `timeout: 40000` to reliably detect elements)
+2. **Delayed Element Availability**: Semester cards not consistently available, causing "element not found" errors (required fallback to `menuButton`)
+3. **Navigation Reliability**: Navigation logic needed retries and delays to work consistently
+
+### Impact on BrowserStack Testing
+
+Homepage performance issues **directly contributed to BrowserStack failures**:
+- Network latency (100-500ms per command) amplified slow loading (40s → 50-60s+)
+- Elements weren't ready when expected, causing frequent detection failures
+- Stricter timeout constraints couldn't accommodate slow performance
+- **Result**: BrowserStack integration was removed - app performance made cloud testing impractical
+
+### Developer Recommendations
+
+**Critical improvements needed**:
+- Reduce homepage load time from ~40s to <5s
+- Optimize semester card rendering and async data loading
+- Improve navigation performance and reduce transition delays
+- Add performance monitoring in test suite
+
+**Note**: These issues were identified through flaky test behavior, demonstrating E2E testing's value in uncovering real application problems.
 
 ## How to Run Automation Tests
 
@@ -155,22 +186,22 @@ JUnit XML reports are automatically generated in `test-results/` directory.
 
 ## Improvements and Next Steps
 
+### Critical (App Performance)
+- **Homepage performance optimization** (see Performance Issues section above)
+  - Reduce initial load time from ~40s to <5s
+  - Optimize semester card rendering
+  - Improve navigation reliability
+  - **Note**: These improvements are required before BrowserStack cloud testing can be effectively implemented
+
 ### Short-Term
 - Expand test coverage (MCQ quiz, interview page interactions)
 - Implement WebView testing for compiler page
-- Add visual regression testing
-- Performance metrics collection
+- Add visual regression testing (Maybe Percy App)
+- Performance metrics collection in test suite
 
 ### Medium-Term
 - iOS testing support
 - Parallel test execution
 - CI/CD integration (GitHub Actions)
-- Cloud device testing (BrowserStack/App Automate)
+- Cloud device testing (BrowserStack/App Automate) - **Blocked until app performance improvements**
 - Enhanced reporting and notifications
-
-### Long-Term
-- API testing integration
-- Security testing
-- Localization testing
-- Network condition testing
-- Advanced multi-user scenarios
