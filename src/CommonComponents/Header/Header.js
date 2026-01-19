@@ -41,6 +41,9 @@ const Header = props => {
           activeOpacity={0.8}
           onPress={() => goBack()}
           style={styles?.backButtonStyle}
+          testID="backButton"
+          accessibilityLabel="backButton"
+          accessible={true}
         >
           <Icons name={'back'} width={28} height={28} fill={Colors?.WHITE} />
         </TouchableOpacity>

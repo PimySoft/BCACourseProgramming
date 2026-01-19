@@ -1,5 +1,4 @@
 import type { Browser } from 'webdriverio';
-import { expect } from '@wdio/globals';
 import { Util } from '../utils/Util';
 import { APP_PACKAGE_NAME } from '../config/constants';
 
@@ -12,29 +11,18 @@ export class BasePage {
     this.driver = driver;
   }
 
-  get menuButton() {
-    return this.driver.$('android=new UiSelector().description("menuButton")');
-  }
-
-  get homeButton() {
-    return this.driver.$('android=new UiSelector().description("Semester1")');
-  }
-
   get languageModalCloseButton() {
     return this.driver.$('android=new UiSelector().description("languageModalCloseButton")');
   }
 
-  async click(element: WebdriverIOElement, timeout: number = 10000): Promise<void> {
-    await element.waitForDisplayed({ timeout });
-    await element.click();
+  getPageTitleByText(titleText: string) {
+    return this.driver.$(`android=new UiSelector().text("${titleText}")`);
   }
 
-  async isDisplayed(element: WebdriverIOElement): Promise<boolean> {
-    const exists = await element.isExisting();
-    if (!exists) {
-      return false;
-    }
-    return await element.isDisplayed();
+  async click(element: WebdriverIOElement, timeout: number = 10000): Promise<void> {
+    await element.waitForExist({ timeout });
+    await element.waitForDisplayed({ timeout });
+    await element.click();
   }
 
   async swipeDown(): Promise<void> {
@@ -43,14 +31,6 @@ export class BasePage {
 
   async swipeUp(): Promise<void> {
     await Util.swipeUp(this.driver);
-  }
-
-  async hideKeyboard(): Promise<void> {
-    await Util.hideKeyboard(this.driver);
-  }
-
-  async openMenu(): Promise<void> {
-    await this.click(this.menuButton);
   }
 
   async dismissExternalApps(): Promise<void> {
@@ -70,18 +50,12 @@ export class BasePage {
     }
   }
 
-  async isOnHomePage(): Promise<boolean> {
-    return await this.isDisplayed(this.homeButton);
-  }
-
   async navigateToHome(): Promise<void> {
     await this.dismissExternalApps();
-    await this.driver.activateApp(APP_PACKAGE_NAME);
     
-    if (!(await this.isOnHomePage())) {
-      await this.driver.pressKeyCode(4);
-      await this.homeButton.waitForDisplayed({ timeout: 10000 });
-    }
+    await this.driver.terminateApp(APP_PACKAGE_NAME);
+    await this.driver.activateApp(APP_PACKAGE_NAME);
+    await this.dismissLanguageModal();
   }
 
   async dismissLanguageModal(): Promise<void> {
@@ -95,11 +69,5 @@ export class BasePage {
   // Resets app state by activating app (resets to main activity).
   async cleanup(): Promise<void> {
     await this.driver.activateApp(APP_PACKAGE_NAME);
-  }
-
-  async waitForPageLoad(): Promise<void> {
-    await expect(this.menuButton).toBeDisplayed({ 
-      message: 'Menu button should be displayed on page' 
-    });
   }
 }

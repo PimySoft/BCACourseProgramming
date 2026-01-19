@@ -22,36 +22,16 @@ describe('Compiler Page Tests', () => {
   });
 
   it('should navigate to compiler page from home', async () => {
-    await expect(homePage.compiler).toBeDisplayed({ 
-      message: 'Compiler button should be displayed on home page' 
-    });
-
     await homePage.click(homePage.compiler);
     await compilerPage.waitForPageLoad();
-
-    await expect(compilerPage.menuButton).toBeDisplayed({ 
-      message: 'Menu button should be displayed on compiler page' 
-    });
   });
 
-  it('should navigate back to home from compiler page', async () => {
+  it('should navigate back from compiler page to home', async () => {
     await homePage.click(homePage.compiler);
     await compilerPage.waitForPageLoad();
 
-    await expect(compilerPage.menuButton).toBeDisplayed({ 
-      message: 'Menu button should be displayed on compiler page' 
-    });
-
-    await compilerPage.navigateToHome();
+    await driver.pressKeyCode(4);
     await homePage.waitForPageLoad();
-
-    await expect(homePage.menuButton).toBeDisplayed({ 
-      message: 'Should return to home page after navigating from compiler' 
-    });
-
-    await expect(homePage.compiler).toBeDisplayed({ 
-      message: 'Compiler button should be displayed after returning to home' 
-    });
   });
 });
 

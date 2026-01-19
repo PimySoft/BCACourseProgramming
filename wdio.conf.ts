@@ -11,7 +11,6 @@ export const config: Options.Testrunner = {
     './e2e/specs/**/*.ts'
   ],
   
-  exclude: [],
   
   maxInstances: 1,
   
@@ -26,7 +25,7 @@ export const config: Options.Testrunner = {
       'appium:automationName': 'UiAutomator2',
       'appium:noReset': false,
       'appium:fullReset': false, // Using activateApp in cleanup instead for better performance
-      'appium:newCommandTimeout': 300,
+      'appium:newCommandTimeout': 30,
       'appium:connectHardwareKeyboard': true,
     }
   ],
@@ -39,19 +38,12 @@ export const config: Options.Testrunner = {
   
   waitforTimeout: 10000,
   
-  connectionRetryTimeout: 120000,
+  connectionRetryTimeout: 30000,
   
-  connectionRetryCount: 3,
+  connectionRetryCount: 2,
   
   services: [
-    ['appium', {
-      args: {
-        address: 'localhost',
-        port: 4723,
-        relaxedSecurity: true
-      },
-      logPath: './logs'
-    }]
+    // Appium is started manually - using existing instance
   ],
   
   framework: 'mocha',
@@ -73,7 +65,9 @@ export const config: Options.Testrunner = {
   
   mochaOpts: {
     ui: 'bdd',
-    timeout: 60000
+    timeout: 60000,
+    require: [],
+    compilers: []
   },
   
   beforeSpec: async function (spec, capabilities) {
@@ -113,8 +107,11 @@ export const config: Options.Testrunner = {
     }
   },
   
-  onComplete: function(exitCode, config, capabilities, results) {
-    // Add any final cleanup
+  onComplete: function(exitCode: number) {
+    // Force exit after a short delay to allow cleanup
+    setTimeout(() => {
+      process.exit(exitCode);
+    }, 2000);
   }
 };
 
